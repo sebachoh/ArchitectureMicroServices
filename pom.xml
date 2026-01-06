@@ -11,8 +11,9 @@
 	<groupId>com.example</groupId>
 	<artifactId>ArchitectureMicroServices</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>ArchitectureMicroServices</name>
-	<description>CI2 Projet</description>
+	<description>CI2 Projet - Parent POM</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,19 +29,11 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<spring-boot.version>4.0.1</spring-boot.version>
 	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+	<modules>
+	</modules>
 
 	<build>
 		<plugins>
@@ -50,5 +43,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
