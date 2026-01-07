@@ -33,7 +33,8 @@
 	</properties>
 
 	<modules>
-		<module>catalogue-service</module>
+    <module>catalogue-service</module>
+    <module>panier-service</module>
 	</modules>
 
 	<build>
