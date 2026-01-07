@@ -1,5 +1,10 @@
 package com.example.catalogue.entity;
 
+// Otros imports adicionales
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,9 +16,12 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name has to be not blank")
     private String name;
     private String description;
+    @Positive(message = "Price has to be positive")
     private double price;
+    @Min(value = 0, message = "Quantity cannot be negative")
     private int quantity;
 
     // Default Constructor

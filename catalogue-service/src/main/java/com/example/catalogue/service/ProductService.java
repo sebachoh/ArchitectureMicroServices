@@ -23,6 +23,22 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    /////
+    ///
+    ///
+    ///
+    public Product updateProduct(Long id, Product productDetails) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        product.setName(productDetails.getName());
+        product.setDescription(productDetails.getDescription());
+        product.setPrice(productDetails.getPrice());
+        product.setQuantity(productDetails.getQuantity());
+
+        return productRepository.save(product);
+    }
+
     // Buscar por ID
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
