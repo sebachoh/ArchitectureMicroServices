@@ -33,6 +33,7 @@
 	</properties>
 
 	<modules>
+		<module>catalogue-service</module>
 	</modules>
 
 	<build>

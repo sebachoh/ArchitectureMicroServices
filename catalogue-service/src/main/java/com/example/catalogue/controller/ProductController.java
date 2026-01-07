@@ -1,7 +1,7 @@
 package com.example.catalogue.controller;
 
 import com.example.catalogue.entity.Product;
-import com.example.catalogue.repository.ProductRepository;
+import com.example.catalogue.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,16 +13,27 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @GetMapping
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productService.getAllProducts();
+    }
+
+    @GetMapping("/{id}")
+    public Product getProductById(@PathVariable Long id) {
+        return productService.getProductById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con el id: " + id));
     }
 
     @PostMapping
     public Product createProduct(@RequestBody Product product) {
-        return productRepository.save(product);
+        return productService.saveProduct(product);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
     }
 
 }
