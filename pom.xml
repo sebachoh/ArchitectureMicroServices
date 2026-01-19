@@ -49,6 +49,7 @@
         <module>catalogue-service</module>
         <module>panier-service</module>
         <module>gateway-service</module>
+        <module>paiment-service</module>
     </modules>
 
     <build>
