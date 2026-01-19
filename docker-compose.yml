@@ -39,6 +39,21 @@ services:
       - catalogue
       - paiment
 
+  tracking:
+    build: ./tracking-service
+    container_name: tracking-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_APPLICATION_NAME=tracking-service
+      - SERVER_PORT=8084
+    networks:
+      - microservices-network
+    depends_on:
+      - catalogue
+      - paiment
+      - panier
+
 networks:
   microservices-network:
     driver: bridge
