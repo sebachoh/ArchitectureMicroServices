@@ -48,4 +48,25 @@ export const catalogueService = {
     },
 };
 
+export const panierService = {
+    addToCart: async (productId: number, quantity: number): Promise<void> => {
+        try {
+            await api.post(`/cart/add`, null, {
+                params: { productId, quantity },
+            });
+        } catch (error) {
+            console.error('Error adding to backend cart:', error);
+            throw error;
+        }
+    },
+    clearCart: async (): Promise<void> => {
+        try {
+            await api.delete('/cart');
+        } catch (error) {
+            console.error('Error clearing backend cart:', error);
+            throw error;
+        }
+    },
+};
+
 export default api;
