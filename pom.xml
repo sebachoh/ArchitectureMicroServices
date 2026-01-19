@@ -50,6 +50,7 @@
         <module>panier-service</module>
         <module>gateway-service</module>
         <module>tracking-service</module>
+        <module>paiment-service</module>
     </modules>
 
     <build>
