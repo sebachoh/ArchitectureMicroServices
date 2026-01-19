@@ -1,3 +1,5 @@
 spring:
   application:
     name: paiment-service
+server:
+  port: 8083
