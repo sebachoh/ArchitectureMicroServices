@@ -21,7 +21,7 @@ export function CartSidebar() {
                 <div className="p-6 border-b border-white/5 flex items-center justify-between bg-stone-950/50">
                     <div className="flex items-center gap-3">
                         <ShoppingBag className="text-orange-500" />
-                        <h2 className="text-xl font-bold text-white">Tu Pedido</h2>
+                        <h2 className="text-xl font-bold text-white">Votre commande</h2>
                     </div>
                     <button
                         onClick={toggleCart}
@@ -36,12 +36,12 @@ export function CartSidebar() {
                     {items.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50">
                             <ShoppingBag size={48} className="text-stone-600" />
-                            <p className="text-stone-400">Tu carrito está vacío</p>
+                            <p className="text-stone-400">Votre panier est vide</p>
                             <button
                                 onClick={toggleCart}
                                 className="text-orange-500 font-semibold hover:underline"
                             >
-                                Explorar productos
+                                Explorer les produits
                             </button>
                         </div>
                     ) : (
@@ -93,7 +93,7 @@ export function CartSidebar() {
                     <div className="p-6 border-t border-white/10 bg-stone-950">
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-stone-400">
-                                <span>Subtotal</span>
+                                <span>Sous-total</span>
                                 <span>{totalPrice.toFixed(2)}€</span>
                             </div>
                             <div className="flex justify-between text-xl font-bold text-white">
@@ -109,7 +109,7 @@ export function CartSidebar() {
                             }}
                             className="w-full bg-orange-600 hover:bg-orange-500 text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-900/20 hover:scale-[1.02] active:scale-[0.98]"
                         >
-                            <span>Proceder al Pago</span>
+                            <span>Passer à la caisse</span>
                             <ArrowRight size={20} />
                         </button>
                     </div>

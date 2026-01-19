@@ -5,10 +5,10 @@ export function OrderTracking() {
     const { setView } = useCart();
 
     const steps = [
-        { icon: CheckCircle2, label: "Confirmado", time: "15:30", active: true },
-        { icon: ChefHat, label: "Preparando", time: "15:45", active: true },
-        { icon: Truck, label: "En camino", time: "16:10", active: false },
-        { icon: MapPin, label: "Entregado", time: "16:25", active: false },
+        { icon: CheckCircle2, label: "Confirmé", time: "15:30", active: true },
+        { icon: ChefHat, label: "En préparation", time: "15:45", active: true },
+        { icon: Truck, label: "En route", time: "16:10", active: false },
+        { icon: MapPin, label: "Livré", time: "16:25", active: false },
     ];
 
     return (
@@ -20,10 +20,10 @@ export function OrderTracking() {
                         <CheckCircle2 size={40} />
                     </div>
                     <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-stone-400 bg-clip-text text-transparent">
-                        ¡Pedido Confirmado!
+                        Commande Confirmée !
                     </h1>
                     <p className="text-stone-400 text-lg">
-                        Gracias por tu compra. Tus empanadas están en buenas manos.
+                        Merci pour votre achat. Vos empanadas sont entre de bonnes mains.
                     </p>
                 </div>
 
@@ -58,7 +58,7 @@ export function OrderTracking() {
                     className="bg-stone-800 hover:bg-stone-700 text-white px-8 py-3 rounded-xl font-bold inline-flex items-center gap-2 transition-all"
                 >
                     <Home size={18} />
-                    Volver a la Tienda
+                    Retour à la boutique
                 </button>
             </div>
         </div>

@@ -86,7 +86,7 @@ export function StoreContent() {
                         Saveurs Authentiques
                     </div>
                     <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-orange-100 via-orange-50 to-stone-400 bg-clip-text text-transparent tracking-tight">
-                        Bienvenue a l'Empanada!
+                        Bienvenue à l'Empanada !
                     </h1>
                     <p className="text-stone-400 text-xl max-w-2xl mx-auto leading-relaxed">
                         Explorez une expérience d'achat colombienne authentique, préparée avec passion et tradition.
