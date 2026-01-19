@@ -1,11 +1,14 @@
-import { ShoppingCart, Home, Star, UtensilsCrossed } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingCart, Home, Star, UtensilsCrossed, Loader2 } from 'lucide-react';
 import logo from '../assets/img/Logo.png';
 import empanadaImg from '../assets/img/products/1-empanada.png';
 import arepaImg from '../assets/img/products/2-arepa.jpg';
 import bandejaImg from '../assets/img/products/3-bandeja.jpg';
 import { useCart } from '../context/CartContext';
+import { catalogueService } from '../services/api';
+import type { Product } from '../types';
 
-const PRODUCTS = [
+const STATIC_PRODUCTS = [
     {
         id: 1,
         name: "Empanada",
@@ -34,6 +37,24 @@ const PRODUCTS = [
 
 export function StoreContent() {
     const { addToCart, toggleCart, totalItems } = useCart();
+    const [products, setProducts] = useState<Product[]>(STATIC_PRODUCTS);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                const data = await catalogueService.getProducts();
+                if (data && data.length > 0) {
+                    setProducts(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch backend products, using fallback:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadProducts();
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#0c0a09] text-stone-100 font-sans selection:bg-orange-500/30">
@@ -95,47 +116,54 @@ export function StoreContent() {
 
                 {/* Grid de Productos Rediseñado */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {PRODUCTS.map((product) => (
-                        <div key={product.id} className="group relative bg-stone-900 border border-white/5 rounded-[2rem] p-4 hover:border-orange-500/30 transition-all duration-500 hover:-translate-y-2">
-                            {/* Imagen del Producto */}
-                            <div className="aspect-[4/3] rounded-[1.5rem] mb-6 overflow-hidden relative">
-                                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                                />
-
-                                {/* Rating Badge */}
-                                <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md border border-white/10 px-2 py-1 rounded-lg flex items-center gap-1 text-xs font-bold text-white z-20">
-                                    <Star size={10} className="text-yellow-400 fill-yellow-400" />
-                                    {product.rating}
-                                </div>
-                            </div>
-
-                            {/* Contenido de la Tarjeta */}
-                            <div className="px-2 pb-2">
-                                <h3 className="text-2xl font-bold mb-2 text-stone-100 group-hover:text-orange-400 transition-colors">{product.name}</h3>
-                                <p className="text-stone-500 text-sm mb-6 leading-relaxed line-clamp-2">
-                                    {product.description}
-                                </p>
-
-                                <div className="flex items-center justify-between mt-auto">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs text-stone-500 font-medium uppercase tracking-wider">Prix</span>
-                                        <span className="text-2xl font-bold text-white">{product.price.toFixed(2)}€</span>
-                                    </div>
-                                    <button
-                                        onClick={() => addToCart(product)}
-                                        className="bg-white text-stone-950 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-xl shadow-black/20 flex items-center gap-2 group/btn active:scale-95"
-                                    >
-                                        Ajouter
-                                        <ShoppingCart size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                                    </button>
-                                </div>
-                            </div>
+                    {isLoading && products.length === 0 ? (
+                        <div className="col-span-full flex flex-col items-center justify-center py-24 gap-4">
+                            <Loader2 className="w-12 h-12 text-orange-500 animate-spin" />
+                            <p className="text-stone-500 font-medium">Chargement des saveurs...</p>
                         </div>
-                    ))}
+                    ) : (
+                        products.map((product) => (
+                            <div key={product.id} className="group relative bg-stone-900 border border-white/5 rounded-[2rem] p-4 hover:border-orange-500/30 transition-all duration-500 hover:-translate-y-2">
+                                {/* Imagen del Producto */}
+                                <div className="aspect-[4/3] rounded-[1.5rem] mb-6 overflow-hidden relative">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                    />
+
+                                    {/* Rating Badge */}
+                                    <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md border border-white/10 px-2 py-1 rounded-lg flex items-center gap-1 text-xs font-bold text-white z-20">
+                                        <Star size={10} className="text-yellow-400 fill-yellow-400" />
+                                        {product.rating}
+                                    </div>
+                                </div>
+
+                                {/* Contenido de la Tarjeta */}
+                                <div className="px-2 pb-2">
+                                    <h3 className="text-2xl font-bold mb-2 text-stone-100 group-hover:text-orange-400 transition-colors">{product.name}</h3>
+                                    <p className="text-stone-500 text-sm mb-6 leading-relaxed line-clamp-2">
+                                        {product.description}
+                                    </p>
+
+                                    <div className="flex items-center justify-between mt-auto">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs text-stone-500 font-medium uppercase tracking-wider">Prix</span>
+                                            <span className="text-2xl font-bold text-white">{product.price.toFixed(2)}€</span>
+                                        </div>
+                                        <button
+                                            onClick={() => addToCart(product)}
+                                            className="bg-white text-stone-950 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-xl shadow-black/20 flex items-center gap-2 group/btn active:scale-95"
+                                        >
+                                            Ajouter
+                                            <ShoppingCart size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </main>
         </div>
