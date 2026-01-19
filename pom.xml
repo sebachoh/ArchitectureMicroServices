@@ -35,6 +35,7 @@
 	<modules>
     <module>catalogue-service</module>
     <module>panier-service</module>
+    <module>tracking-service</module>
 	</modules>
 
 	<build>
