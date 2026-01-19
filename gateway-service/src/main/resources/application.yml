@@ -13,20 +13,14 @@ spring:
         - id: panier-service
           uri: http://localhost:8082
           predicates:
-            - Path=/api/panier/**
-          filters:
-            - RewritePath=/api/panier/(?<segment>.*), /${segment}
+            - Path=/cart/**
 
         - id: paiement-service
           uri: http://localhost:8083
           predicates:
-            - Path=/api/paiement/**
-          filters:
-            - RewritePath=/api/paiement/(?<segment>.*), /api/${segment}
+            - Path=/api/payments/**
 
         - id: tracking-service
           uri: http://localhost:8084
           predicates:
             - Path=/api/tracking/**
-          filters:
-            - RewritePath=/api/tracking/(?<segment>.*), /api/${segment}
