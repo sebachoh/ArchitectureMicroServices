@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { CartItem, Product } from '../types';
+import { panierService } from '../services/api';
 
 interface CartContextType {
     items: CartItem[];
@@ -12,6 +13,7 @@ interface CartContextType {
     totalPrice: number;
     view: 'store' | 'checkout' | 'tracking';
     setView: (view: 'store' | 'checkout' | 'tracking') => void;
+    syncCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -54,6 +56,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const toggleCart = () => setIsOpen(prev => !prev);
 
+    const syncCart = async () => {
+        try {
+            // 1. Vaciar el carrito previo en el backend para evitar duplicados si se re-sincroniza
+            await panierService.clearCart();
+
+            // 2. Enviar cada item actual al backend
+            for (const item of items) {
+                await panierService.addToCart(item.id, item.quantity);
+            }
+            console.log('Cart synced successfully with backend');
+        } catch (error) {
+            console.error('Failed to sync cart:', error);
+            throw error; // Re-throw to handle in UI
+        }
+    };
+
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -68,7 +86,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             totalItems,
             totalPrice,
             view,
-            setView
+            setView,
+            syncCart
         }}>
             {children}
         </CartContext.Provider>

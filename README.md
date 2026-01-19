@@ -31,7 +31,7 @@ This project follows a **microservices architecture** with an API Gateway patter
 ```
                          ┌─────────────────┐
                          │    Frontend     │
-                         │   (Vite/Vue)    │
+                         │    (React)      │
                          └────────┬────────┘
                                   │
                          ┌────────▼────────┐
@@ -96,7 +96,7 @@ Tracks order status and location throughout delivery process.
 📄 **Detailed API documentation:** [tracking-service/ENDPOINTS_TEST.md](tracking-service/ENDPOINTS_TEST.md)
 
 ### 5. **Frontend** (Port: 5173)
-Web application built with Vite and Vue.js/React for the user interface.
+Web application built with Vite and React for the user interface.
 
 ---
 
@@ -200,6 +200,13 @@ cd tracking-service
 java -jar target/tracking-service-0.0.1-SNAPSHOT.jar
 ```
 ✅ Service running on: http://localhost:8083
+
+**Terminal 5 - Frontend (Start LAST):**
+```bash
+cd frontend
+npm run dev
+```
+✅ Frontend running on: http://localhost:5173
 
 ### Fall services are running, test them:
 
@@ -318,7 +325,7 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 │       │   └── service/TrackingService.java
 │       └── resources/application.properties
 │
-└── frontend/                        # Frontend application (Vite/Vue)
+└── frontend/                        # Frontend application (React)
     ├── package.json
     ├── vite.config.ts
     ├── src/
@@ -330,7 +337,7 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 │       │   ├── PanierApplication.java
 │       │   ├── controller/CartController.java
 │       │   ├── entity/CartItem.java
-│   �️ Technologies Used
+│   ️ Technologies Used
 
 ### Backend
 | Technology | Version | Purpose |
@@ -349,7 +356,7 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 | Technology | Purpose |
 |------------|---------|
 | **Vite** | Build tool and dev server |
-| **Vue.js / React** | Frontend framework |
+| **React** | Frontend framework |
 | **TypeScript** | Type-safe JavaScript |
 | **Tailwind CSS** | Utility-first CSS framework |
 | **Node.js** | JavaScript runtime |

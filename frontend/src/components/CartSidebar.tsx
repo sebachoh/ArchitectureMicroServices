@@ -2,7 +2,7 @@ import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export function CartSidebar() {
-    const { items, isOpen, toggleCart, updateQuantity, removeFromCart, totalPrice, setView } = useCart();
+    const { items, isOpen, toggleCart, updateQuantity, removeFromCart, totalPrice, setView, syncCart } = useCart();
 
     if (!isOpen) return null;
 
@@ -103,9 +103,14 @@ export function CartSidebar() {
                         </div>
 
                         <button
-                            onClick={() => {
-                                toggleCart();
-                                setView('checkout');
+                            onClick={async () => {
+                                try {
+                                    await syncCart();
+                                    toggleCart();
+                                    setView('checkout');
+                                } catch (error) {
+                                    alert('Erreur lors de la synchronisation du panier. Veuillez réessayer.');
+                                }
                             }}
                             className="w-full bg-orange-600 hover:bg-orange-500 text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-900/20 hover:scale-[1.02] active:scale-[0.98]"
                         >
