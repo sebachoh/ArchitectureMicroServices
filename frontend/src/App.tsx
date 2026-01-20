@@ -2,10 +2,15 @@ import { CartProvider, useCart } from './context/CartContext';
 import { CartSidebar } from './components/CartSidebar';
 import { Checkout } from './components/Checkout';
 import { OrderTracking } from './components/OrderTracking';
+import { AdminDashboard } from './components/AdminDashboard';
 import { StoreContent } from './components/StoreContent';
 
 function MainLayout() {
-  const { view } = useCart();
+  const { view, role } = useCart();
+
+  if (role === 'ADMIN') {
+    return <AdminDashboard />;
+  }
 
   return (
     <>

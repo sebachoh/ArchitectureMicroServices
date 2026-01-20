@@ -62,12 +62,12 @@ public class ProductController {
     }
 
     // Reduce stock (called by panier-service during checkout)
-    @PutMapping("/{id}/reduce-stock")
-    public ResponseEntity<String> reduceStock(
+    // Reduce stock (called by panier-service during checkout)
+    @PostMapping("/{id}/reduceStock")
+    public void reduceStock(
             @PathVariable Long id, 
             @RequestParam int quantity) {
         productService.reduceStock(id, quantity);
-        return ResponseEntity.ok("Stock reduced successfully");
     }
 
     // Restore stock (called when order is cancelled)

@@ -36,7 +36,7 @@ const STATIC_PRODUCTS = [
 ];
 
 export function StoreContent() {
-    const { addToCart, toggleCart, totalItems } = useCart();
+    const { addToCart, toggleCart, totalItems, role, toggleRole } = useCart();
     const [products, setProducts] = useState<Product[]>(STATIC_PRODUCTS);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -93,6 +93,13 @@ export function StoreContent() {
                                         {totalItems}
                                     </span>
                                 )}
+                            </button>
+
+                            <button
+                                onClick={toggleRole}
+                                className="hidden md:flex items-center gap-2 px-4 py-2 bg-stone-900 border border-white/10 rounded-full text-xs font-bold text-stone-400 hover:text-white hover:border-orange-500/50 hover:bg-stone-800 transition-all uppercase tracking-wider"
+                            >
+                                <span className={role === 'ADMIN' ? 'text-orange-500' : ''}>Admin</span>
                             </button>
                         </div>
                     </div>

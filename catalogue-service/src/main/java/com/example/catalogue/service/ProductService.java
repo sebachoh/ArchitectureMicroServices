@@ -46,6 +46,8 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+
+
     // Check if product has sufficient stock
     public boolean hasStock(Long productId, int requestedQuantity) {
         Product product = productRepository.findById(productId)
