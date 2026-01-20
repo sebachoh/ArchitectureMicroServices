@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  catalogue:
+    build: ./catalogue-service
+    container_name: catalogue-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_APPLICATION_NAME=catalogue-service
+      - SERVER_PORT=8081
+    networks:
+      - microservices-network
+
+  paiment:
+    build: ./paiment-service
+    container_name: paiment-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_APPLICATION_NAME=paiment-service
+      - SERVER_PORT=8083
+    networks:
+      - microservices-network
+    depends_on:
+      - catalogue
+
+  panier:
+    build: ./panier-service
+    container_name: panier-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_APPLICATION_NAME=panier-service
+      - SERVER_PORT=8082
+    networks:
+      - microservices-network
+    depends_on:
+      - catalogue
+      - paiment
+
+  tracking:
+    build: ./tracking-service
+    container_name: tracking-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_APPLICATION_NAME=tracking-service
+      - SERVER_PORT=8084
+    networks:
+      - microservices-network
+    depends_on:
+      - catalogue
+      - paiment
+      - panier
+
+networks:
+  microservices-network:
+    driver: bridge

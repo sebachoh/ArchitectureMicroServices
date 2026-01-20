@@ -1,7 +1,10 @@
 package com.example.panier.controller;
 
 import com.example.panier.entity.CartItem;
+import com.example.panier.entity.Order;
 import com.example.panier.service.CartService;
+import com.example.panier.dto.CheckoutRequest;
+import com.example.panier.dto.CheckoutResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,23 +17,40 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    // Endpoint para añadir productos
-    // Ejemplo: POST http://localhost:8082/cart/add?productId=1&quantity=2
+    // Add product to cart
     @PostMapping("/add")
     public CartItem addToCart(@RequestParam Long productId, @RequestParam Integer quantity) {
         return cartService.addToCart(productId, quantity);
     }
 
-    // Endpoint para ver el carrito actual
+    // View cart
     @GetMapping
     public List<CartItem> getCart() {
         return cartService.getCart();
     }
 
-    // Endpoint para vaciar el carrito
+    // Clear cart
     @DeleteMapping
     public String clearCart() {
         cartService.clearCart();
-        return "Carrito vaciado correctamente";
+        return "Cart cleared successfully";
+    }
+
+    // Complete checkout
+    @PostMapping("/checkout")
+    public CheckoutResponse checkout(@RequestBody CheckoutRequest request) {
+        return cartService.checkout(request);
+    }
+
+    // Get all orders
+    @GetMapping("/orders")
+    public List<Order> getAllOrders() {
+        return cartService.getAllOrders();
+    }
+
+    // Get order by ID
+    @GetMapping("/orders/{orderId}")
+    public Order getOrderById(@PathVariable Long orderId) {
+        return cartService.getOrderById(orderId);
     }
 }

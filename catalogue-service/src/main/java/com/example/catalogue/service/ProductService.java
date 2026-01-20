@@ -19,6 +19,7 @@ public class ProductService {
     }
 
     // Guardar un producto
+    @SuppressWarnings("null")
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
@@ -27,6 +28,7 @@ public class ProductService {
     ///
     ///
     ///
+    @SuppressWarnings("null")
     public Product updateProduct(Long id, Product productDetails) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
@@ -40,11 +42,13 @@ public class ProductService {
     }
 
     // Buscar por ID
+    @SuppressWarnings("null")
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
 
     // Eliminar
+    @SuppressWarnings("null")
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
@@ -59,6 +63,38 @@ public class ProductService {
         }
 
         product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+    }
+    // Check if product has sufficient stock
+    @SuppressWarnings("null")
+    public boolean hasStock(Long productId, int requestedQuantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        return product.getQuantity() >= requestedQuantity;
+    }
+
+    // Reduce stock (for checkout)
+    @SuppressWarnings("null")
+    public void reduceStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        
+        if (product.getQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock for product: " + product.getName() + 
+                    ". Available: " + product.getQuantity() + ", Requested: " + quantity);
+        }
+        
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+    }
+
+    // Restore stock (for order cancellation)
+    @SuppressWarnings("null")
+    public void restoreStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        
+        product.setQuantity(product.getQuantity() + quantity);
         productRepository.save(product);
     }
 }

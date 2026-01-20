@@ -23,6 +23,7 @@ public class PaimentItemService {
     private final String CATALOGUE_URL = "http://localhost:8081/api/products";
 
     @SuppressWarnings("unchecked")
+    @SuppressWarnings("null")
     public PaimentItem createPayment(PaimentItem paiment) {
         // 1. Validate Cart (Simulated by checking if cart is not empty)
         // In a real scenario, we would pass paiment.getCartId() to validating endpoint
@@ -63,6 +64,7 @@ public class PaimentItemService {
         return savedPayment;
     }
 
+    @SuppressWarnings("null")
     public PaimentItem processPayment(Long id) {
         Optional<PaimentItem> paiment = paimentItemRepository.findById(id);
         if (paiment.isPresent()) {
@@ -73,6 +75,7 @@ public class PaimentItemService {
         return null;
     }
 
+    @SuppressWarnings("null")
     public Optional<PaimentItem> getPayment(Long id) {
         return paimentItemRepository.findById(id);
     }
@@ -85,6 +88,7 @@ public class PaimentItemService {
         return paimentItemRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public void deletePayment(Long id) {
         paimentItemRepository.deleteById(id);
     }

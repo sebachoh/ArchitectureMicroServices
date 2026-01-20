@@ -4,9 +4,11 @@ import com.example.catalogue.entity.Product;
 import com.example.catalogue.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -45,6 +47,39 @@ public class ProductController {
     @PostMapping("/{id}/reduceStock")
     public void reduceStock(@PathVariable Long id, @RequestParam int quantity) {
         productService.reduceStock(id, quantity);
+    // Check stock availability
+    @GetMapping("/{id}/check-stock")
+    public ResponseEntity<Map<String, Object>> checkStock(
+            @PathVariable Long id, 
+            @RequestParam int quantity) {
+        boolean hasStock = productService.hasStock(id, quantity);
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        
+        return ResponseEntity.ok(Map.of(
+            "productId", id,
+            "available", hasStock,
+            "currentStock", product.getQuantity(),
+            "requestedQuantity", quantity
+        ));
+    }
+
+    // Reduce stock (called by panier-service during checkout)
+    @PutMapping("/{id}/reduce-stock")
+    public ResponseEntity<String> reduceStock(
+            @PathVariable Long id, 
+            @RequestParam int quantity) {
+        productService.reduceStock(id, quantity);
+        return ResponseEntity.ok("Stock reduced successfully");
+    }
+
+    // Restore stock (called when order is cancelled)
+    @PutMapping("/{id}/restore-stock")
+    public ResponseEntity<String> restoreStock(
+            @PathVariable Long id, 
+            @RequestParam int quantity) {
+        productService.restoreStock(id, quantity);
+        return ResponseEntity.ok("Stock restored successfully");
     }
 
 }
