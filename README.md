@@ -188,77 +188,130 @@ npm -version
 
 ## 🚀 Getting Started
 
-### Option 1: Running with Docker Compose (Recommended)
+### 🐳 Running with Docker (Recommended - Step by Step)
 
-This is the **fastest and easiest** way to run the entire application.
+This is the **fastest and easiest** way to run the entire application. Follow these steps in order:
 
-**Prerequisites:**
-- Docker and Docker Compose installed ([Download Docker Desktop](https://www.docker.com/products/docker-desktop))
+#### Prerequisites
+- **Docker Desktop** installed and running ([Download here](https://www.docker.com/products/docker-desktop))
+- **Java 17** (to build the JARs)
+- **Maven** (included in the project)
 
-**Quick Start with Scripts:**
+#### Step-by-Step Instructions
 
-```bash
-# Windows
-start.bat
-
-# Linux/Mac
-chmod +x start.sh
-./start.sh
-```
-
-**Manual Steps:**
-
-1. **Clone the repository**
+**Step 1: Clone the repository**
 ```bash
 git clone <repository-url>
 cd ArchitectureMicroServices
 ```
 
-2. **Build all backend services JARs**
+**Step 2: Build all backend services**
+
+This creates the JAR files needed by Docker:
+
 ```bash
-# Windows
+# Windows (Command Prompt or PowerShell)
 mvnw.cmd clean package -DskipTests
 
-# Linux/Mac
+# Linux/Mac (Terminal)
 ./mvnw clean package -DskipTests
 ```
 
-3. **Start all services with Docker Compose**
+Wait for the build to complete. You should see "BUILD SUCCESS" for each service.
+
+**Step 3: Start all services with Docker Compose**
+
 ```bash
 docker-compose up -d
 ```
 
-This will start:
-- Gateway Service (port 8080)
-- Catalogue Service (port 8081)
-- Panier Service (port 8082)
-- Paiment Service (port 8083)
-- Tracking Service (port 8084)
-- Frontend (port 80)
+This command will:
+- Build Docker images for all services (first time only)
+- Start all containers in the background
+- Create the network between services
 
-4. **Verify services are running**
+**Step 4: Wait for services to start (30-60 seconds)**
+
+Check if all containers are running:
+
 ```bash
 docker-compose ps
 ```
 
-5. **Access the application**
-- Frontend: http://localhost
-- API Gateway: http://localhost:8080
-- Direct service access: ports 8081-8084
+You should see 6 containers running:
+- gateway-service
+- catalogue-service  
+- panier-service
+- paiment-service
+- tracking-service
+- frontend-app
 
-6. **View logs**
+**Step 5: Verify the application is working**
+
+Test the API Gateway:
+```bash
+curl http://localhost:8080/api/products
+```
+
+Or open your browser and visit:
+- **Frontend**: http://localhost
+- **API Gateway**: http://localhost:8080
+
+**Step 6: View logs (optional)**
+
 ```bash
 # All services
 docker-compose logs -f
 
 # Specific service
 docker-compose logs -f catalogue
+
+# Press Ctrl+C to stop viewing logs
 ```
 
-7. **Stop all services**
+**Step 7: Stop all services when done**
+
 ```bash
 docker-compose down
 ```
+
+This stops and removes all containers.
+
+---
+
+### ⚡ Quick Start (One Command)
+
+If you want everything automated:
+
+```bash
+# Windows
+start.bat
+
+# Linux/Mac  
+chmod +x start.sh
+./start.sh
+```
+
+These scripts will:
+1. ✅ Check if Docker is running
+2. ✅ Build all services
+3. ✅ Start Docker Compose
+4. ✅ Show you the URLs to access
+
+---
+
+### 🎯 What You Get
+
+After running Docker Compose, these services will be available:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://localhost | Web application (React) |
+| **API Gateway** | http://localhost:8080 | Main API entry point |
+| **Catalogue** | http://localhost:8081 | Product management |
+| **Panier** | http://localhost:8082 | Shopping cart |
+| **Paiment** | http://localhost:8083 | Payment processing |
+| **Tracking** | http://localhost:8084 | Order tracking |
 
 ---
 

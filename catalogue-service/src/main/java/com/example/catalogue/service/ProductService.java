@@ -13,22 +13,17 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    // Obtener todos los productos
+    // Get all products
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // Guardar un producto
-    @SuppressWarnings("null")
+    // Save a product
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
 
-    /////
-    ///
-    ///
-    ///
-    @SuppressWarnings("null")
+    // Update product
     public Product updateProduct(Long id, Product productDetails) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
@@ -41,20 +36,17 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    // Buscar por ID
-    @SuppressWarnings("null")
+    // Find by ID
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
 
-    // Eliminar
-    @SuppressWarnings("null")
+    // Delete
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
 
     // Check if product has sufficient stock
-    @SuppressWarnings("null")
     public boolean hasStock(Long productId, int requestedQuantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
@@ -62,7 +54,6 @@ public class ProductService {
     }
 
     // Reduce stock (for checkout)
-    @SuppressWarnings("null")
     public void reduceStock(Long productId, int quantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
@@ -77,7 +68,6 @@ public class ProductService {
     }
 
     // Restore stock (for order cancellation)
-    @SuppressWarnings("null")
     public void restoreStock(Long productId, int quantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
