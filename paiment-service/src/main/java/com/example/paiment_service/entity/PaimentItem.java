@@ -21,7 +21,16 @@ public class PaimentItem {
     
     private Boolean approved;
 
+    private Long cartId;
+
     // Getters and Setters
+    public Long getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(Long cartId) {
+        this.cartId = cartId;
+    }
     public Long getId() {
         return id;
     }

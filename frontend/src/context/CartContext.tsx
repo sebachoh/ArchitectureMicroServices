@@ -4,6 +4,7 @@ import { panierService } from '../services/api';
 
 interface CartContextType {
     items: CartItem[];
+    cartId: number | null;
     isOpen: boolean;
     addToCart: (product: Product) => void;
     removeFromCart: (id: number) => void;
@@ -20,6 +21,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
+    const [cartId, setCartId] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState<'store' | 'checkout' | 'tracking'>('store');
 
@@ -60,12 +62,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         try {
             // 1. Vaciar el carrito previo en el backend para evitar duplicados si se re-sincroniza
             await panierService.clearCart();
+            setCartId(null);
 
             // 2. Enviar cada item actual al backend
+            let firstId = null;
             for (const item of items) {
-                await panierService.addToCart(item.id, item.quantity);
+                const response = await panierService.addToCart(item.id, item.quantity);
+                if (!firstId) firstId = response.id;
             }
-            console.log('Cart synced successfully with backend');
+            if (firstId) setCartId(firstId);
+
+            console.log('Cart synced successfully with backend, ID:', firstId);
         } catch (error) {
             console.error('Failed to sync cart:', error);
             throw error; // Re-throw to handle in UI
@@ -78,6 +85,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return (
         <CartContext.Provider value={{
             items,
+            cartId,
             isOpen,
             addToCart,
             removeFromCart,

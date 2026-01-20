@@ -49,11 +49,12 @@ export const catalogueService = {
 };
 
 export const panierService = {
-    addToCart: async (productId: number, quantity: number): Promise<void> => {
+    addToCart: async (productId: number, quantity: number): Promise<any> => {
         try {
-            await api.post(`/cart/add`, null, {
+            const response = await api.post(`/cart/add`, null, {
                 params: { productId, quantity },
             });
+            return response.data;
         } catch (error) {
             console.error('Error adding to backend cart:', error);
             throw error;
@@ -67,6 +68,18 @@ export const panierService = {
             throw error;
         }
     },
+};
+
+export const paymentService = {
+    createPayment: async (paymentData: any): Promise<any> => {
+        try {
+            const response = await api.post('/api/payments', paymentData);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating payment:', error);
+            throw error;
+        }
+    }
 };
 
 export default api;

@@ -48,4 +48,17 @@ public class ProductService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
+
+    // Reducir stock
+    public void reduceStock(Long id, int quantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (product.getQuantity() < quantity) {
+            throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
+        }
+
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+    }
 }

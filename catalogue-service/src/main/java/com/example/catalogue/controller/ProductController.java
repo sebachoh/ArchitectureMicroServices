@@ -42,4 +42,9 @@ public class ProductController {
         return productService.updateProduct(id, product);
     }
 
+    @PostMapping("/{id}/reduceStock")
+    public void reduceStock(@PathVariable Long id, @RequestParam int quantity) {
+        productService.reduceStock(id, quantity);
+    }
+
 }
