@@ -1,10 +1,40 @@
 import { ArrowRight, ArrowLeft, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useState } from 'react';
+import { paymentService } from '../services/api';
 
 export function Checkout() {
-    const { items, totalPrice, setView } = useCart();
+    const { items, totalPrice, setView, cartId } = useCart();
     const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash');
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handlePayment = async () => {
+        if (!cartId) {
+            alert("Erreur: Impossible de récupérer l'identifiant du panier. Veuillez réessayer.");
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            // Hardcoded card details for demo purposes, as requested
+            const paymentData = {
+                cardType: "VISA",
+                cardNumber: "1234-5678-9012-3456",
+                amount: totalPrice,
+                cartId: cartId
+            };
+
+            await paymentService.createPayment(paymentData);
+
+            // On success
+            setView('tracking');
+        } catch (error) {
+            console.error(error);
+            alert("Une erreur est survenue lors du paiement. Veuillez réessayer.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#0c0a09] text-stone-100 flex items-center justify-center p-4 md:p-8">
@@ -94,11 +124,18 @@ export function Checkout() {
                     </div>
 
                     <button
-                        onClick={() => setView('tracking')}
-                        className="w-full bg-orange-600 hover:bg-orange-500 text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-900/20 hover:scale-[1.02] active:scale-[0.98]"
+                        onClick={handlePayment}
+                        disabled={isProcessing}
+                        className="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-900/20 hover:scale-[1.02] active:scale-[0.98]"
                     >
-                        <span>Confirmer la commande</span>
-                        <ArrowRight size={20} />
+                        {isProcessing ? (
+                            <span>Traitement...</span>
+                        ) : (
+                            <>
+                                <span>Confirmer la commande</span>
+                                <ArrowRight size={20} />
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
