@@ -53,6 +53,8 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+
+
     // Check if product has sufficient stock
     @SuppressWarnings("null")
     public boolean hasStock(Long productId, int requestedQuantity) {
