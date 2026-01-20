@@ -23,7 +23,6 @@ public class PaimentItemService {
     private final String CATALOGUE_URL = "http://localhost:8081/api/products";
 
     @SuppressWarnings("unchecked")
-    @SuppressWarnings("null")
     public PaimentItem createPayment(PaimentItem paiment) {
         // 1. Validate Cart (Simulated by checking if cart is not empty)
         // In a real scenario, we would pass paiment.getCartId() to validating endpoint
