@@ -46,7 +46,7 @@ This project follows a **microservices architecture** with an API Gateway patter
 ┌───────▼───────┐       ┌─────────▼────────┐     ┌────────▼────────┐
 │   Catalogue   │       │     Panier       │     │    Tracking     │
 │   Service     │◄──────│    Service       │     │    Service      │
-│  Port: 8081   │       │   Port: 8082     │     │   Port: 8083    │
+│  Port: 8081   │       │   Port: 8082     │     │   Port: 8084    │
 │               │       │                  │     │                 │
 │ Products DB   │       │ Cart Items DB    │     │  Tracking DB    │
 │(cataloguedb)  │       │  (panierdb)      │     │ (trackingdb)    │
@@ -213,7 +213,7 @@ java -jar target/panier-service-0.0.1-SNAPSHOT.jar
 cd tracking-service
 java -jar target/tracking-service-0.0.1-SNAPSHOT.jar
 ```
-✅ Service running on: http://localhost:8083
+✅ Service running on: http://localhost:8084
 
 **Terminal 5 - Frontend (Start LAST):**
 ```bash
@@ -241,7 +241,7 @@ curl http://localhost:8082/cart
 curl http://localhost:8080/cart
 
 # Test Tracking Service (direct)
-curl http://localhost:8083/api/tracking
+curl http://localhost:8084/api/tracking
 
 # Test Tracking Service (via Gateway)
 curl http://localhost:8080/api/tracking
@@ -254,7 +254,7 @@ curl http://localhost:8080/api/tracking
 | Gateway | - | http://localhost:8080 | - |
 | Catalogue | http://localhost:8081/api/products | http://localhost:8080/api/products | - |
 | Panier | http://localhost:8082/cart | http://localhost:8080/cart | - |
-| Tracking | http://localhost:8083/api/tracking | http://localhost:8080/api/tracking | - |
+| Tracking | http://localhost:8084/api/tracking | http://localhost:8080/api/tracking | - |
 | Frontend | - | - | http://localhost:5173 |
 
 ### H2 Database Consoles
@@ -468,7 +468,7 @@ Make sure all backend services are running BEFORE starting the gateway.
 ```bash
 curl http://localhost:8081/api/products
 curl http://localhost:8082/cart
-curl http://localhost:8083/api/tracking
+curl http://localhost:8084/api/tracking
 ```ion | Purpose |
 |------------|---------|---------|
 | **Java** | 17 | Programming language |
