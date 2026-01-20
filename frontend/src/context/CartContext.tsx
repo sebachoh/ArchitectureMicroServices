@@ -15,6 +15,8 @@ interface CartContextType {
     view: 'store' | 'checkout' | 'tracking';
     setView: (view: 'store' | 'checkout' | 'tracking') => void;
     syncCart: () => Promise<void>;
+    role: 'USER' | 'ADMIN';
+    toggleRole: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -24,6 +26,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [cartId, setCartId] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState<'store' | 'checkout' | 'tracking'>('store');
+    const [role, setRole] = useState<'USER' | 'ADMIN'>('USER');
 
     const addToCart = (product: Product) => {
         setItems(currentItems => {
@@ -79,6 +82,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const toggleRole = () => setRole(prev => prev === 'USER' ? 'ADMIN' : 'USER');
+
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -95,7 +100,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
             totalPrice,
             view,
             setView,
-            syncCart
+            syncCart,
+            role,
+            toggleRole
         }}>
             {children}
         </CartContext.Provider>
