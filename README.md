@@ -1,6 +1,8 @@
 # 🛒 E-Commerce Microservices Architecture
 
-Multi-module Spring Boot project implementing a microservices-based e-commerce system with catalogue, shopping cart, order tracking services, API gateway, and frontend application.
+Multi-module Spring Boot project implementing a **fully integrated** microservices-based e-commerce system with catalogue, shopping cart, order tracking services, API gateway, and frontend application.
+
+> **🎉 Integration Complete!** All microservices are now connected and communicating with each other. See [INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md) for detailed integration flow and testing guide.
 
 ---
 
@@ -61,10 +63,10 @@ API Gateway using Spring Cloud Gateway for routing requests to backend services.
 **Routes:**
 - `/api/products/**` → Catalogue Service (8081)
 - `/cart/**` → Panier Service (8082)
-- `/api/tracking/**` → Tracking Service (8083)
+- `/api/tracking/**` → Tracking Service (8084)
 
 ### 2. **Catalogue Service** (Port: 8081)
-Manages the product catalogue with full CRUD operations.
+Manages the product catalogue with full CRUD operations and **stock management**.
 
 **Endpoints:** `/api/products`
 - `GET /api/products` - List all products
@@ -72,17 +74,25 @@ Manages the product catalogue with full CRUD operations.
 - `POST /api/products` - Create product
 - `PUT /api/products/{id}` - Update product
 - `DELETE /api/products/{id}` - Delete product
+- `GET /api/products/check-stock?productId={id}&quantity={qty}`** - Check stock availability
+- `PUT /api/products/reduce-stock?productId={id}&quantity={qty}`** - Reduce stock (used by checkout)
+- `PUT /api/products/restore-stock?productId={id}&quantity={qty}`** - Restore stock (on cancellation)
 
 ### 3. **Panier Service** (Port: 8082)
-Manages shopping cart functionality. Communicates with Catalogue Service.
+**Order orchestrator** that manages cart and coordinates the complete checkout workflow.
 
 **Endpoints:** `/cart`
 - `GET /cart` - View cart items
-- `POST /cart/add?productId={id}&quantity={qty}` - Add to cart
+- `POST /cart/add?productId={id}&quantity={qty}` - Add to cart *(validates stock)*
 - `DELETE /cart` - Clear cart
+- `POST /cart/checkout`** - Complete checkout (creates order, reduces stock, creates tracking)
+- `GET /cart/orders`** - Get all orders
+- `GET /cart/orders/{id}`** - Get specific order details
 
-### 4. **Tracking Service** (Port: 8083)
-Tracks order status and location throughout delivery process.
+**Integration:** Calls Catalogue (stock validation/reduction) and Tracking (order tracking creation)
+
+### 4. **Tracking Service** (Port: 8084)
+Tracks order status and provides **enriched tracking data** with product details.
 
 **Endpoints:** `/api/tracking`
 - `GET /api/tracking` - List all trackings
@@ -92,6 +102,10 @@ Tracks order status and location throughout delivery process.
 - `POST /api/tracking` - Create tracking
 - `PUT /api/tracking/{id}` - Update tracking status
 - `DELETE /api/tracking/{id}` - Delete tracking
+- `GET /api/tracking/order/{orderId}/enriched`** - Get tracking + product details
+- `PUT /api/tracking/order/{orderId}/cancel`** - Cancel order
+
+**Integration:** Calls Catalogue to enrich tracking data with product information
 
 📄 **Detailed API documentation:** [tracking-service/ENDPOINTS_TEST.md](tracking-service/ENDPOINTS_TEST.md)
 
@@ -503,7 +517,9 @@ If your IDE shows errors:
 
 ## 👥 Contributors
 
-- Your Name - Initial development
+- Sebastian Ruiz
+- Jose Villa
+- Javier Vargas
 
 ---
 

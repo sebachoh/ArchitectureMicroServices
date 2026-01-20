@@ -13,10 +13,12 @@ public class PaimentItemService {
     @Autowired
     private PaimentItemRepository paimentItemRepository;
 
+    @SuppressWarnings("null")
     public PaimentItem createPayment(PaimentItem paiment) {
         return paimentItemRepository.save(paiment);
     }
 
+    @SuppressWarnings("null")
     public PaimentItem processPayment(Long id) {
         Optional<PaimentItem> paiment = paimentItemRepository.findById(id);
         if (paiment.isPresent()) {
@@ -27,6 +29,7 @@ public class PaimentItemService {
         return null;
     }
 
+    @SuppressWarnings("null")
     public Optional<PaimentItem> getPayment(Long id) {
         return paimentItemRepository.findById(id);
     }
@@ -39,6 +42,7 @@ public class PaimentItemService {
         return paimentItemRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public void deletePayment(Long id) {
         paimentItemRepository.deleteById(id);
     }

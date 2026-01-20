@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tracking")
@@ -52,5 +53,18 @@ public class TrackingController {
     @DeleteMapping("/{id}")
     public void deleteTracking(@PathVariable Long id) {
         trackingService.deleteTracking(id);
+    }
+
+    // Get enriched tracking with product details
+    @GetMapping("/order/{orderId}/enriched")
+    public Map<String, Object> getEnrichedTracking(@PathVariable Long orderId) {
+        return trackingService.getEnrichedTracking(orderId);
+    }
+
+    // Cancel order
+    @PutMapping("/order/{orderId}/cancel")
+    public String cancelOrder(@PathVariable Long orderId) {
+        trackingService.cancelOrder(orderId);
+        return "Order cancelled successfully";
     }
 }
