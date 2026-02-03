@@ -1,6 +1,22 @@
 version: '3.8'
 
 services:
+  gateway:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_NAME=gateway-service
+      - SERVER_PORT=8080
+    networks:
+      - microservices-network
+    depends_on:
+      - catalogue
+      - panier
+      - paiment
+      - tracking
+
   catalogue:
     build: ./catalogue-service
     container_name: catalogue-service
@@ -11,19 +27,6 @@ services:
       - SERVER_PORT=8081
     networks:
       - microservices-network
-
-  paiment:
-    build: ./paiment-service
-    container_name: paiment-service
-    ports:
-      - "8083:8083"
-    environment:
-      - SPRING_APPLICATION_NAME=paiment-service
-      - SERVER_PORT=8083
-    networks:
-      - microservices-network
-    depends_on:
-      - catalogue
 
   panier:
     build: ./panier-service
@@ -39,6 +42,19 @@ services:
       - catalogue
       - paiment
 
+  paiment:
+    build: ./paiment-service
+    container_name: paiment-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_APPLICATION_NAME=paiment-service
+      - SERVER_PORT=8083
+    networks:
+      - microservices-network
+    depends_on:
+      - catalogue
+
   tracking:
     build: ./tracking-service
     container_name: tracking-service
@@ -53,6 +69,16 @@ services:
       - catalogue
       - paiment
       - panier
+
+  frontend:
+    build: ./frontend
+    container_name: frontend-app
+    ports:
+      - "80:80"
+    networks:
+      - microservices-network
+    depends_on:
+      - gateway
 
 networks:
   microservices-network:

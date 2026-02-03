@@ -84,7 +84,7 @@ curl http://localhost:8080/api/products/1
 ### ✅ Test 1.3: Check Stock Availability (NEW)
 ```bash
 # Check if 5 units available
-curl "http://localhost:8080/api/products/1/stock/check?quantity=5"
+curl "http://localhost:8080/api/products/1/check-stock?quantity=5"
 ```
 
 **Expected Response:**
@@ -94,7 +94,7 @@ true
 
 ```bash
 # Check if 100 units available (should return false)
-curl "http://localhost:8080/api/products/1/stock/check?quantity=100"
+curl "http://localhost:8080/api/products/1/check-stock?quantity=100"
 ```
 
 **Expected Response:**
@@ -102,10 +102,10 @@ curl "http://localhost:8080/api/products/1/stock/check?quantity=100"
 false
 ```
 
-### ✅ Test 1.4: Deduct Stock (NEW)
+### ✅ Test 1.4: Reduce Stock (NEW)
 ```bash
-# Deduct 3 units from product 1
-curl -X PUT "http://localhost:8080/api/products/1/stock/deduct?quantity=3"
+# Reduce 3 units from product 1
+curl -X PUT "http://localhost:8080/api/products/1/reduce-stock?quantity=3"
 ```
 
 **Expected Response:** `200 OK`
@@ -119,7 +119,7 @@ curl http://localhost:8080/api/products/1
 ### ✅ Test 1.5: Restore Stock (NEW)
 ```bash
 # Restore 3 units to product 1
-curl -X PUT "http://localhost:8080/api/products/1/stock/restore?quantity=3"
+curl -X PUT "http://localhost:8080/api/products/1/restore-stock?quantity=3"
 ```
 
 **Expected Response:** `200 OK`
@@ -130,10 +130,10 @@ curl http://localhost:8080/api/products/1
 # Should show quantity: 15 (back to original)
 ```
 
-### ❌ Test 1.6: Deduct More Than Available Stock (Error Case)
+### ❌ Test 1.6: Reduce More Than Available Stock (Error Case)
 ```bash
-# Try to deduct 100 units (only 15 available)
-curl -X PUT "http://localhost:8080/api/products/1/stock/deduct?quantity=100"
+# Try to reduce 100 units (only 15 available)
+curl -X PUT "http://localhost:8080/api/products/1/reduce-stock?quantity=100"
 ```
 
 **Expected Response:** `500 Internal Server Error`
@@ -769,11 +769,11 @@ curl -X POST "http://localhost:8080/cart/add?productId=1&quantity=5"
 ```
 GET    /api/products                          - List all products
 GET    /api/products/{id}                     - Get product by ID
-GET    /api/products/{id}/stock/check?quantity={qty} - Check stock
+GET    /api/products/{id}/check-stock?quantity={qty} - Check stock
 POST   /api/products                          - Create product
 PUT    /api/products/{id}                     - Update product
-PUT    /api/products/{id}/stock/deduct?quantity={qty} - Deduct stock
-PUT    /api/products/{id}/stock/restore?quantity={qty} - Restore stock
+PUT    /api/products/{id}/reduce-stock?quantity={qty} - Reduce stock
+PUT    /api/products/{id}/restore-stock?quantity={qty} - Restore stock
 DELETE /api/products/{id}                     - Delete product
 ```
 
@@ -818,7 +818,7 @@ DELETE /api/tracking/{id}                      - Delete tracking
 - [ ] Catalogue: List products
 - [ ] Catalogue: Get product by ID
 - [ ] Catalogue: Check stock
-- [ ] Catalogue: Deduct stock
+- [ ] Catalogue: Reduce stock
 - [ ] Catalogue: Restore stock
 - [ ] Panier: Add to cart (basic)
 - [ ] Panier: View cart

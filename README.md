@@ -1,8 +1,8 @@
 # 🛒 E-Commerce Microservices Architecture
 
-Multi-module Spring Boot project implementing a **fully integrated** microservices-based e-commerce system with catalogue, shopping cart, order tracking services, API gateway, and frontend application.
+Multi-module Spring Boot project implementing a microservices-based e-commerce system with catalogue, shopping cart, payment processing, order tracking services, API gateway, and frontend application.
 
-> **🎉 Integration Complete!** All microservices are now connected and communicating with each other. See [INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md) for detailed integration flow and testing guide.
+📄 **Detailed project documentation**: [PROJECT_DESCRIPTION.md](PROJECT_DESCRIPTION.md)
 
 ---
 
@@ -30,27 +30,68 @@ This project follows a **microservices architecture** with an API Gateway patter
 - API Gateway routes external requests to appropriate services
 - Frontend application consumes the APIs
 
-```
-                         ┌─────────────────┐
-                         │    Frontend     │
-                         │    (React)      │
-                         └────────┬────────┘
-                                  │
-                         ┌────────▼────────┐
-                         │  API Gateway    │
-                         │   Port: 8080    │
-                         └────────┬────────┘
-                                  │
-        ┌─────────────────────────┼─────────────────────────┐
-        │                         │                         │
-┌───────▼───────┐       ┌─────────▼────────┐     ┌────────▼────────┐
-│   Catalogue   │       │     Panier       │     │    Tracking     │
-│   Service     │◄──────│    Service       │     │    Service      │
-│  Port: 8081   │       │   Port: 8082     │     │   Port: 8084    │
-│               │       │                  │     │                 │
-│ Products DB   │       │ Cart Items DB    │     │  Tracking DB    │
-│(cataloguedb)  │       │  (panierdb)      │     │ (trackingdb)    │
-└───────────────┘       └──────────────────┘     └─────────────────┘
+```mermaid
+graph TB
+    Client[🌐 Client Browser]
+    
+    subgraph Frontend Layer
+        FE[Frontend<br/>React + Vite<br/>Port: 80]
+    end
+    
+    subgraph API Gateway Layer
+        GW[API Gateway<br/>Spring Cloud Gateway<br/>Port: 8080]
+    end
+    
+    subgraph Microservices Layer
+        subgraph Catalogue
+            CAT[Catalogue Service<br/>Port: 8081]
+            CATDB[(H2 Database<br/>cataloguedb)]
+        end
+        
+        subgraph Panier
+            PAN[Panier Service<br/>Port: 8082]
+            PANDB[(H2 Database<br/>panierdb)]
+        end
+        
+        subgraph Paiment
+            PAY[Paiment Service<br/>Port: 8083]
+            PAYDB[(H2 Database<br/>paimentdb)]
+        end
+        
+        subgraph Tracking
+            TRA[Tracking Service<br/>Port: 8084]
+            TRADB[(H2 Database<br/>trackingdb)]
+        end
+    end
+    
+    Client --> FE
+    FE --> GW
+    
+    GW --> CAT
+    GW --> PAN
+    GW --> PAY
+    GW --> TRA
+    
+    CAT --> CATDB
+    PAN --> PANDB
+    PAY --> PAYDB
+    TRA --> TRADB
+    
+    PAN -.->|Stock validation| CAT
+    PAN -.->|Create tracking| TRA
+    TRA -.->|Enrich data| CAT
+    
+    style Client fill:#e1f5ff
+    style FE fill:#bbdefb
+    style GW fill:#90caf9
+    style CAT fill:#a5d6a7
+    style PAN fill:#ffcc80
+    style PAY fill:#ef9a9a
+    style TRA fill:#ce93d8
+    style CATDB fill:#c8e6c9
+    style PANDB fill:#ffe0b2
+    style PAYDB fill:#ffcdd2
+    style TRADB fill:#e1bee7
 ```
 
 ---
@@ -63,10 +104,11 @@ API Gateway using Spring Cloud Gateway for routing requests to backend services.
 **Routes:**
 - `/api/products/**` → Catalogue Service (8081)
 - `/cart/**` → Panier Service (8082)
+- `/api/payments/**` → Paiment Service (8083)
 - `/api/tracking/**` → Tracking Service (8084)
 
 ### 2. **Catalogue Service** (Port: 8081)
-Manages the product catalogue with full CRUD operations and **stock management**.
+Manages the product catalogue with full CRUD operations and stock management.
 
 **Endpoints:** `/api/products`
 - `GET /api/products` - List all products
@@ -74,25 +116,36 @@ Manages the product catalogue with full CRUD operations and **stock management**
 - `POST /api/products` - Create product
 - `PUT /api/products/{id}` - Update product
 - `DELETE /api/products/{id}` - Delete product
-- `GET /api/products/check-stock?productId={id}&quantity={qty}`** - Check stock availability
-- `PUT /api/products/reduce-stock?productId={id}&quantity={qty}`** - Reduce stock (used by checkout)
-- `PUT /api/products/restore-stock?productId={id}&quantity={qty}`** - Restore stock (on cancellation)
+- `GET /api/products/check-stock?productId={id}&quantity={qty}` - Check stock availability
+- `PUT /api/products/reduce-stock?productId={id}&quantity={qty}` - Reduce stock (used by checkout)
+- `PUT /api/products/restore-stock?productId={id}&quantity={qty}` - Restore stock (on cancellation)
 
 ### 3. **Panier Service** (Port: 8082)
-**Order orchestrator** that manages cart and coordinates the complete checkout workflow.
+Order orchestrator that manages cart and coordinates the complete checkout workflow.
 
 **Endpoints:** `/cart`
 - `GET /cart` - View cart items
-- `POST /cart/add?productId={id}&quantity={qty}` - Add to cart *(validates stock)*
+- `POST /cart/add?productId={id}&quantity={qty}` - Add to cart (validates stock)
 - `DELETE /cart` - Clear cart
-- `POST /cart/checkout`** - Complete checkout (creates order, reduces stock, creates tracking)
-- `GET /cart/orders`** - Get all orders
-- `GET /cart/orders/{id}`** - Get specific order details
+- `POST /cart/checkout` - Complete checkout (creates order, reduces stock, creates tracking)
+- `GET /cart/orders` - Get all orders
+- `GET /cart/orders/{id}` - Get specific order details
 
 **Integration:** Calls Catalogue (stock validation/reduction) and Tracking (order tracking creation)
 
-### 4. **Tracking Service** (Port: 8084)
-Tracks order status and provides **enriched tracking data** with product details.
+### 4. **Paiment Service** (Port: 8083)
+Manages payment processing and transaction records.
+
+**Endpoints:** `/api/payments`
+- `GET /api/payments` - List all payments
+- `GET /api/payments/{id}` - Get payment by ID
+- `GET /api/payments/card/{cardNumber}` - Get payment by card number
+- `POST /api/payments` - Create payment
+- `PUT /api/payments/{id}/process` - Process payment approval
+- `DELETE /api/payments/{id}` - Delete payment
+
+### 5. **Tracking Service** (Port: 8084)
+Tracks order status and provides enriched tracking data with product details.
 
 **Endpoints:** `/api/tracking`
 - `GET /api/tracking` - List all trackings
@@ -102,14 +155,14 @@ Tracks order status and provides **enriched tracking data** with product details
 - `POST /api/tracking` - Create tracking
 - `PUT /api/tracking/{id}` - Update tracking status
 - `DELETE /api/tracking/{id}` - Delete tracking
-- `GET /api/tracking/order/{orderId}/enriched`** - Get tracking + product details
-- `PUT /api/tracking/order/{orderId}/cancel`** - Cancel order
+- `GET /api/tracking/order/{orderId}/enriched` - Get tracking + product details
+- `PUT /api/tracking/order/{orderId}/cancel` - Cancel order
 
 **Integration:** Calls Catalogue to enrich tracking data with product information
 
 📄 **Detailed API documentation:** [tracking-service/ENDPOINTS_TEST.md](tracking-service/ENDPOINTS_TEST.md)
 
-### 5. **Frontend** (Port: 5173)
+### 6. **Frontend** (Port: 5173)
 Web application built with Vite and React for the user interface.
 
 ---
@@ -134,6 +187,153 @@ npm -version
 ---
 
 ## 🚀 Getting Started
+
+### 🐳 Running with Docker (Recommended - Step by Step)
+
+This is the **fastest and easiest** way to run the entire application. Follow these steps in order:
+
+#### Prerequisites
+- **Docker Desktop** installed and running ([Download here](https://www.docker.com/products/docker-desktop))
+- **Java 17** (to build the JARs)
+- **Maven** (included in the project)
+
+#### Step-by-Step Instructions
+
+**Step 1: Clone the repository**
+```bash
+git clone <repository-url>
+cd ArchitectureMicroServices
+```
+
+**Step 2: Build all backend services**
+
+This creates the JAR files needed by Docker:
+
+```bash
+# Windows (Command Prompt or PowerShell)
+mvnw.cmd clean package -DskipTests
+
+# Linux/Mac (Terminal)
+./mvnw clean package -DskipTests
+```
+
+Wait for the build to complete. You should see "BUILD SUCCESS" for each service.
+
+**Step 3: Start all services with Docker Compose**
+
+```bash
+docker-compose up -d
+```
+
+This command will:
+- Build Docker images for all services (first time only)
+- Start all containers in the background
+- Create the network between services
+
+**Step 4: Wait for services to start (30-60 seconds)**
+
+Check if all containers are running:
+
+```bash
+docker-compose ps
+```
+
+You should see 6 containers running:
+- gateway-service
+- catalogue-service  
+- panier-service
+- paiment-service
+- tracking-service
+- frontend-app
+
+**Step 5: Verify the application is working**
+
+Test the API Gateway:
+```bash
+curl http://localhost:8080/api/products
+```
+
+Or open your browser and visit:
+- **Frontend**: http://localhost
+- **API Gateway**: http://localhost:8080
+
+**Step 6: View logs (optional)**
+
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f catalogue
+
+# Press Ctrl+C to stop viewing logs
+```
+
+**Step 7: Stop all services when done**
+
+```bash
+docker-compose down
+```
+
+This stops and removes all containers.
+
+---
+
+### ⚡ Quick Start (One Command)
+
+If you want everything automated:
+
+```bash
+# Windows
+start.bat
+
+# Linux/Mac  
+chmod +x start.sh
+./start.sh
+```
+
+These scripts will:
+1. ✅ Check if Docker is running
+2. ✅ Build all services
+3. ✅ Start Docker Compose
+4. ✅ Show you the URLs to access
+
+---
+
+### 🎯 What You Get
+
+After running Docker Compose, these services will be available:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://localhost | Web application (React) |
+| **API Gateway** | http://localhost:8080 | Main API entry point |
+| **Catalogue** | http://localhost:8081 | Product management |
+| **Panier** | http://localhost:8082 | Shopping cart |
+| **Paiment** | http://localhost:8083 | Payment processing |
+| **Tracking** | http://localhost:8084 | Order tracking |
+
+---
+
+### Option 2: Manual Installation (Development)
+
+For development or if you prefer running services individually.
+
+#### Prerequisites
+
+- **Java 17** or higher ([Download](https://adoptium.net/))
+- **Maven 3.6+** (or use included Maven Wrapper)
+- **Node.js 18+** and **npm** (for frontend) ([Download](https://nodejs.org/))
+
+To verify:
+```bash
+java -version
+mvn -version
+node -version
+npm -version
+```
+
+#### Steps
 
 ### 1. Clone the repository
 ```bash
@@ -201,28 +401,35 @@ java -jar target/catalogue-service-0.0.1-SNAPSHOT.jar
 ```
 ✅ Service running on: http://localhost:8081
 
-**Terminal 3 - Panier Service:**
+**Terminal 3 - Paiment Service:**
+```bash
+cd paiment-service
+java -jar target/paiment-service-0.0.1-SNAPSHOT.jar
+```
+✅ Service running on: http://localhost:8083
+
+**Terminal 4 - Panier Service:**
 ```bash
 cd panier-service
 java -jar target/panier-service-0.0.1-SNAPSHOT.jar
 ```
 ✅ Service running on: http://localhost:8082
 
-**Terminal 4 - Tracking Service:**
+**Terminal 5 - Tracking Service:**
 ```bash
 cd tracking-service
 java -jar target/tracking-service-0.0.1-SNAPSHOT.jar
 ```
 ✅ Service running on: http://localhost:8084
 
-**Terminal 5 - Frontend (Start LAST):**
+**Terminal 6 - Frontend (Start LAST):**
 ```bash
 cd frontend
 npm run dev
 ```
 ✅ Frontend running on: http://localhost:5173
 
-### Fall services are running, test them:
+### Once all services are running, test them:
 
 ```bash
 # Test Gateway Service
@@ -240,6 +447,12 @@ curl http://localhost:8082/cart
 # Test Panier Service (via Gateway)
 curl http://localhost:8080/cart
 
+# Test Paiment Service (direct)
+curl http://localhost:8083/api/payments
+
+# Test Paiment Service (via Gateway)
+curl http://localhost:8080/api/payments
+
 # Test Tracking Service (direct)
 curl http://localhost:8084/api/tracking
 
@@ -254,58 +467,113 @@ curl http://localhost:8080/api/tracking
 | Gateway | - | http://localhost:8080 | - |
 | Catalogue | http://localhost:8081/api/products | http://localhost:8080/api/products | - |
 | Panier | http://localhost:8082/cart | http://localhost:8080/cart | - |
+| Paiment | http://localhost:8083/api/payments | http://localhost:8080/api/payments | - |
 | Tracking | http://localhost:8084/api/tracking | http://localhost:8080/api/tracking | - |
 | Frontend | - | - | http://localhost:5173 |
 
-### H2 Database Consoles
+---
 
-Each backend
+## 🐳 Running with Docker Compose
 
-**Catalogue Service:**
-```bash
-cd catalogue-service
-mvn spring-boot:run
-```
-
-**Panier Service:**
-```bash
-cd panier-service
-mvn spring-boot:run
-```
-
-**Tracking Service:**
-```bash
-cd tracking-service
-mvn spring-boot:run
-```
+See [Option 1 in Getting Started](#option-1-running-with-docker-compose-recommended) for Docker Compose instructions.
 
 ---
 
-## 🧪 Testing the APIs
+## 🧪 Test Scenarios
 
-### Quick Health Check
-
-Once services are running, test them:
+### Scenario 1: Complete Purchase Flow
 
 ```bash
-# Test Catalogue Service
-curl http://localhost:8081/api/products
+# 1. View available products
+curl http://localhost:8080/api/products
 
-# Test Panier Service
-curl http://localhost:8082/cart
+# 2. Add product to cart (replace productId with actual ID)
+curl -X POST "http://localhost:8080/cart/add?productId=1&quantity=2"
 
-# Test Tracking Service
-curl http://localhost:8083/api/tracking
+# 3. View cart
+curl http://localhost:8080/cart
+
+# 4. Checkout (replace with actual customer data)
+curl -X POST http://localhost:8080/cart/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerName": "John Doe",
+    "customerEmail": "john@example.com",
+    "shippingAddress": "123 Main St, City"
+  }'
+
+# 5. Track order (replace orderId with the one from checkout response)
+curl http://localhost:8080/api/tracking/order/{orderId}/enriched
+```
+
+### Scenario 2: Payment Processing
+
+```bash
+# 1. Create payment
+curl -X POST http://localhost:8080/api/payments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cardNumber": "4532123456789012",
+    "amount": 99.99,
+    "approved": false
+  }'
+
+# 2. Process payment (replace {id} with payment ID)
+curl -X PUT http://localhost:8080/api/payments/{id}/process
+
+# 3. View payment status
+curl http://localhost:8080/api/payments/{id}
 ```
 
 ### H2 Database Consoles
-gateway-service/                 # API Gateway (Spring Cloud Gateway)
+
+Each backend service has its own in-memory H2 database accessible via web console:
+
+**Catalogue Service:**
+- URL: http://localhost:8081/h2-console
+- JDBC URL: `jdbc:h2:mem:cataloguedb`
+- Username: `sa`
+- Password: *(empty)*
+
+**Panier Service:**
+- URL: http://localhost:8082/h2-console
+- JDBC URL: `jdbc:h2:mem:panierdb`
+- Username: `sa`
+- Password: *(empty)*
+
+**Paiment Service:**
+- URL: http://localhost:8083/h2-console
+- JDBC URL: `jdbc:h2:mem:paimentdb`
+- Username: `sa`
+- Password: *(empty)*
+
+**Tracking Service:**
+- URL: http://localhost:8084/h2-console
+- JDBC URL: `jdbc:h2:mem:trackingdb`
+- Username: `sa`
+- Password: *(empty)*
+
+---
+
+## 📁 Project Structure
+
+```
+ArchitectureMicroServices/
+│
+├── pom.xml                          # Parent POM
+├── docker-compose.yml               # Docker Compose configuration
+├── README.md                        # This file
+├── INTEGRATION_SUMMARY.md           # Integration details
+├── TESTING_GUIDE.md                 # Testing documentation
+│
+├── gateway-service/                 # API Gateway (Spring Cloud Gateway)
 │   ├── pom.xml
 │   └── src/
 │       └── main/java/com/example/gatewayservice/
 │           └── GatewayServiceApplication.java
 │
 ├── catalogue-service/               # Product catalogue microservice
+│   ├── Dockerfile
 │   ├── pom.xml
 │   └── src/
 │       ├── main/java/com/example/catalogue/
@@ -317,6 +585,7 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 │       └── resources/application.properties
 │
 ├── panier-service/                  # Shopping cart microservice
+│   ├── Dockerfile
 │   ├── pom.xml
 │   └── src/
 │       ├── main/java/com/example/panier/
@@ -327,7 +596,20 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 │       │   └── service/CartService.java
 │       └── resources/application.properties
 │
+├── paiment-service/                 # Payment processing microservice
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/
+│       ├── main/java/com/example/paiment_service/
+│       │   ├── PaimentServiceApplication.java
+│       │   ├── controller/PaimentItemController.java
+│       │   ├── entity/PaimentItem.java
+│       │   ├── repository/PaimentItemRepository.java
+│       │   └── service/PaimentItemService.java
+│       └── resources/application.yaml
+│
 ├── tracking-service/                # Order tracking microservice
+│   ├── Dockerfile
 │   ├── pom.xml
 │   ├── ENDPOINTS_TEST.md            # API documentation
 │   └── src/
@@ -342,16 +624,12 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 └── frontend/                        # Frontend application (React)
     ├── package.json
     ├── vite.config.ts
+    ├── Dockerfile
     ├── src/
     └── public/
-├── panier-service/                  # Shopping cart microservice
-│   ├── pom.xml
-│   └── src/
-│       ├── main/java/com/example/panier/
-│       │   ├── PanierApplication.java
-│       │   ├── controller/CartController.java
-│       │   ├── entity/CartItem.java
-│   ️ Technologies Used
+```
+
+---## 🛠️ Technologies Used
 
 ### Backend
 | Technology | Version | Purpose |
@@ -364,7 +642,7 @@ gateway-service/                 # API Gateway (Spring Cloud Gateway)
 | **H2 Database** | Runtime | In-memory database |
 | **Hibernate** | 6.6.4 | ORM (Object-Relational Mapping) |
 | **Maven** | 3.x | Build tool & dependency management |
-| **Lombok** | Latest | Code generation (optional) |
+| **Docker** | Latest | Containerization |
 
 ### Frontend
 | Technology | Purpose |
@@ -468,42 +746,9 @@ Make sure all backend services are running BEFORE starting the gateway.
 ```bash
 curl http://localhost:8081/api/products
 curl http://localhost:8082/cart
+curl http://localhost:8083/api/payments
 curl http://localhost:8084/api/tracking
-```ion | Purpose |
-|------------|---------|---------|
-| **Java** | 17 | Programming language |
-| **Spring Boot** | 3.4.1 | Application framework |
-| **Spring Data JPA** | 3.4.1 | Database access layer |
-| **Spring Web** | 3.4.1 | REST API creation |
-| **H2 Database** | Runtime | In-memory database |
-| **Hibernate** | 6.6.4 | ORM (Object-Relational Mapping) |
-| **Maven** | 3.x | Build tool & dependency management |
-| **Lombok** | Latest | Code generation (optional) |
-
----
-
-## 🔧 Common Issues & Solutions
-
-### Port already in use
-If you get an error like "Port 8081 is already in use":
-1. Check if another service is running: `netstat -ano | findstr :8081` (Windows)
-2. Kill the process or change the port in `application.properties`
-
-### Build failures
-If the build fails:
-```bash
-# Clean and rebuild
-mvnw.cmd clean install -U
-
-# Skip tests if needed
-mvnw.cmd clean install -DskipTests
 ```
-
-### IDE not recognizing classes
-If your IDE shows errors:
-1. Reload the Maven project
-2. In VS Code: `F1` → "Java: Clean Java Language Server Workspace"
-3. Restart your IDE
 
 ---
 
@@ -511,6 +756,8 @@ If your IDE shows errors:
 
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
 - [Spring Data JPA Guide](https://spring.io/guides/gs/accessing-data-jpa/)
+- [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
+- [Docker Documentation](https://docs.docker.com/)
 - [REST API Best Practices](https://restfulapi.net/)
 
 ---
@@ -525,8 +772,4 @@ If your IDE shows errors:
 
 ## 📝 License
 
-This project is for educational purposes.
-
----
-
-**Happy Coding! 🚀**
+This project is for educational purposes as part of IMT Nord Europe coursework.

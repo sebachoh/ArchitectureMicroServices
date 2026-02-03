@@ -28,7 +28,6 @@ public class TrackingService {
         return trackingRepository.save(trackingInfo);
     }
 
-    @SuppressWarnings("null")
     public TrackingInfo updateStatus(Long id, String newStatus, String location) {
         TrackingInfo tracking = trackingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tracking not found with id: " + id));
@@ -52,18 +51,15 @@ public class TrackingService {
         return trackingRepository.findAll();
     }
 
-    @SuppressWarnings("null")
     public Optional<TrackingInfo> getTrackingById(Long id) {
         return trackingRepository.findById(id);
     }
 
-    @SuppressWarnings("null")
     public void deleteTracking(Long id) {
         trackingRepository.deleteById(id);
     }
 
     // Get enriched tracking with product details
-    @SuppressWarnings("null")
     public Map<String, Object> getEnrichedTracking(Long orderId) {
         TrackingInfo tracking = trackingRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Tracking not found for order: " + orderId));
